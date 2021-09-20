@@ -1,0 +1,56 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.palantir.docker' version '0.28.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "java"
+
+dependencies {
+    implementation group: 'org.json', name: 'json', version: '20210307'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'de.danielbechler:java-object-diff:0.95'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+java {
+    toolchain {
+        sourceCompatibility = '11'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveBaseName = "safari-crawler"
+    archiveVersion = "0.1.0"
+}
+
+docker {
+    // bootJar.baseName resolves to the artifact name, without version and extension information
+    name "${dockerNamespace}/${bootJar.baseName}"
+    dockerfile file('Dockerfile')
+    // bootJar.archivePath resolves to the absolute path of the artifact file
+    files bootJar.archivePath
+    // bootJar.archiveName resolves to the artifact name, including version and extension
+    buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
+}
+
+tasks.getByPath('docker').dependsOn('build')

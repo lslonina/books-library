@@ -1,0 +1,7 @@
+**/cookie.txt
+# Project exclude paths
+/.gradle/
+/library-ui/build/
+/library-ui/node_modules/
+/safari-crawler/build/
+/safari-crawler/build/classes/java/main/

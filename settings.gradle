@@ -1,0 +1,4 @@
+rootProject.name = 'books-library'
+include 'safari-crawler'
+include 'library-ui'
+
