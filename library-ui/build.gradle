@@ -1,8 +1,8 @@
 plugins {
     id "com.github.node-gradle.node" version "3.1.0"
     id "base"
-    id("com.palantir.docker") version "0.28.0"
-//    id("com.palantir.docker-run") version "0.28.0"
+    id "com.palantir.docker" version "0.28.0"
+    id 'com.palantir.docker-run' version "0.28.0"
 }
 
 task bundle(type: NpmTask, dependsOn: npmInstall) {
@@ -16,5 +16,29 @@ task npmStart(type: NpmTask, dependsOn: npmInstall) {
 assemble.dependsOn(bundle)
 
 docker {
-    name "hub.docker.com/sloninal/library-ui"
+    name "library-ui"
+    files 'package.json', 'package-lock.json'
+    copySpec.with {
+        from('.') {
+            include 'src/**'
+            into '.'
+        }
+        from('.') {
+            include 'public/**'
+            into '.'
+        }
+    }
+}
+
+tasks.getByPath('docker').dependsOn('build')
+
+dockerRun {
+    name 'library-ui'
+    image 'library-ui'
+//    volumes 'hostvolume': '/containervolume'
+    ports '8081:8080'
+    daemonize true
+    env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
+//    command 'sleep', '100'
+//    arguments '--hostname=custom', '-P'
 }
