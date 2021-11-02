@@ -42,7 +42,7 @@ class BookList extends Component {
 
         this.setState({isLoading: true, currentPage: page});
 
-        const url="http://localhost:8080/api/books"
+        const url="/api/books"
 
         fetch(url + query + '&page=' + page, {credentials: 'include'})
             .then(response => response.json())
@@ -51,7 +51,7 @@ class BookList extends Component {
     }
 
     async mark(id, action) {
-        const url = `http://localhost:8080/api/books/${id}/${action}`;
+        const url = `/api/books/${id}/${action}`;
         await fetch(url, {
             method: 'POST',
             headers: {
@@ -102,7 +102,7 @@ class BookList extends Component {
                 <td style={{whiteSpace: 'nowrap'}}><Moment format={"DD-MM-YYYY"}>{published}</Moment></td>
                 <td style={{whiteSpace: 'nowrap'}}><Moment format={"DD-MM-YYYY"}>{added}</Moment></td>
                 <td>{book.pages}</td>
-                <td><img src={`http://localhost:8080/api/books/${book.identifier}/cover`} alt="Cover"/></td>
+                <td><img src={`/api/books/${book.identifier}/cover`} alt="Cover"/></td>
                 <td>{book.priority}</td>
                 <td>
                     <ButtonGroup>

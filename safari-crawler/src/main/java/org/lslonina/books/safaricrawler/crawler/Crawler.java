@@ -63,6 +63,7 @@ public class Crawler {
         int page = 0;
         while (true) {
             try {
+                log.info("Loading data for page: " + page);
                 List<SafariBook> safariBooks = getSafariBooks(page);
                 if (safariBooks.isEmpty()) {
                     log.info("Finished loading books, pages: " + page);

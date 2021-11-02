@@ -34,7 +34,7 @@ public class SafariCrawlerApplication {
         return args -> {
 //            export(bookRepository);
 //            deleteData(safariBookRepository, bookDetailsRepository, bookRepository);
-//            fetchData(safariBookRepository, bookDetailsRepository, bookRepository, crawler);
+            fetchData(safariBookRepository, bookDetailsRepository, bookRepository, crawler);
         };
     }
 

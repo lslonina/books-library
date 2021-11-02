@@ -37,7 +37,7 @@ class BookEdit extends Component {
         let id = this.props.match.params.id;
         if (id !== 'new') {
             try {
-                const url=`http://localhost:8080/api/books/${id}`
+                const url=`/api/books/${id}`
                 const book = await (await fetch(url, {credentials: 'include'})).json();
                 this.setState({item: book});
             } catch (error) {

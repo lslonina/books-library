@@ -1,8 +1,8 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.5.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'com.palantir.docker' version '0.28.0'
-    id 'com.palantir.docker-run' version "0.28.0"
+    id 'com.palantir.docker' version '0.30.0'
+    id 'com.palantir.docker-run' version "0.30.0"
 }
 
 repositories {
@@ -45,10 +45,8 @@ bootJar {
 }
 
 docker {
-    // bootJar.baseName resolves to the artifact name, without version and extension information
     name "crawler"
     files bootJar.archiveFile.get().asFile
-    // bootJar.archiveName resolves to the artifact name, including version and extension
     buildArgs(['JAR_FILE': "${bootJar.archiveFileName.get()}"])
 }
 
@@ -59,7 +57,7 @@ dockerRun {
     name 'crawler'
     image 'crawler'
 //    volumes 'hostvolume': '/containervolume'
-    ports '3001:3000'
+    ports '8081:8080'
     daemonize true
-    env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
+    env 'crawler.user': '$CRAWLER_USER', 'crawler.password': '$CRAWLER_PASSWORD'
 }
