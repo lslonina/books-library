@@ -1,5 +1,9 @@
 # Project exclude paths
 **/build/**
+**/bin/**
 /.gradle/
 **/cookie.txt
 **/node_modules/
+.classpath
+.project
+org.eclipse*
