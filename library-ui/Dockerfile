@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:16-alpine3.14
+FROM node:17.0.1-alpine3.14
 
 # set working directory
 WORKDIR /app
@@ -10,7 +10,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 # install app dependencies
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm install npm@7.22.0
+RUN npm install npm@8.1.0
 RUN npm install --silent
 RUN npm install react-scripts@4.0.3 -g --silent
 RUN npm config set unsafe-perm true

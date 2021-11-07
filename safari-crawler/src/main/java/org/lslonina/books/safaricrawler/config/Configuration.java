@@ -5,6 +5,8 @@ import org.lslonina.books.safaricrawler.repository.BookRepository;
 import org.lslonina.books.safaricrawler.repository.SafariBookDetailsRepository;
 import org.lslonina.books.safaricrawler.repository.SafariBookRepository;
 import org.lslonina.books.safaricrawler.service.BookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -16,10 +18,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @SpringBootConfiguration
 @EnableWebMvc
 public class Configuration implements WebMvcConfigurer{
+    private static final Logger log = LoggerFactory.getLogger(Configuration.class);
+
     @Value("${crawler.user}")
     private String user;
 
@@ -41,8 +50,9 @@ public class Configuration implements WebMvcConfigurer{
     }
 
     @Bean
-    public Crawler crawler(RestTemplate restTemplate, SafariBookRepository safariBookRepository, SafariBookDetailsRepository safariBookDetailsRepository, BookRepository bookRepository) throws IOException {
-        return new Crawler(restTemplate, safariBookRepository, safariBookDetailsRepository, bookRepository);
+    public Crawler crawler(RestTemplate restTemplate, SafariBookRepository safariBookRepository, 
+        SafariBookDetailsRepository safariBookDetailsRepository, BookRepository bookRepository, Map<String, Integer> processedBooks) throws IOException {
+        return new Crawler(restTemplate, safariBookRepository, safariBookDetailsRepository, bookRepository, processedBooks);
     }
 
     @Bean
@@ -50,17 +60,35 @@ public class Configuration implements WebMvcConfigurer{
         return new BookService(bookRepository);
     }
 
-    private static String readCookies() throws IOException {
-        InputStream resourceAsStream = Configuration.class.getResourceAsStream("/cookie.txt");
-        StringBuilder textBuilder = new StringBuilder();
-        try (Reader reader = new BufferedReader(new InputStreamReader
-                (resourceAsStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
-            int c;
-            while ((c = reader.read()) != -1) {
-                textBuilder.append((char) c);
-            }
+    @Bean
+    public Map<String, Integer> processedBooks() {
+        try {
+            Map<String, Integer> processed = Files.readAllLines(Path.of("D:\\data\\books\\ignored.csv")).stream().map(s -> s.split(",")).collect(Collectors.toMap(a -> a[0], a -> Integer.valueOf(a[1])));
+            processed.putAll(Files.readAllLines(Path.of("D:\\data\\books\\selected.csv")).stream().map(s -> s.split(",")).collect(Collectors.toMap(a -> a[0], a -> Integer.valueOf(a[1]))));
+            return processed;
         }
-        return textBuilder.toString();
+        catch (IOException ex) {
+            log.warn("No processed books found");
+            return Collections.emptyMap();
+        }
+    }
+
+    private static String readCookies() {
+        try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/cookie.txt")) {
+            StringBuilder textBuilder = new StringBuilder();
+            try (Reader reader = new BufferedReader(new InputStreamReader
+                    (resourceAsStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+                int c;
+                while ((c = reader.read()) != -1) {
+                    textBuilder.append((char) c);
+                }
+            }
+            return textBuilder.toString();
+        } 
+        catch (IOException ex) {
+            log.error("Can't load cookies");
+            return "";
+        }
     }
 
 //    @Override

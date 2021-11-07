@@ -49,13 +49,10 @@ public class SafariCrawlerApplication {
     private void export(BookRepository bookRepository) {
         List<Book> all = bookRepository.findAll();
         List<Book> selected = all.stream().filter(b -> b.getPriority() > 0).collect(Collectors.toList());
-
         List<Book> ignored = all.stream().filter(b -> b.getPriority() < 0).collect(Collectors.toList());
-        List<Book> unprocessed = all.stream().filter(b -> b.getPriority() == 0).collect(Collectors.toList());
 
         export(selected, "selected");
         export(ignored, "ignored");
-        export(unprocessed, "unprocessed");
         System.out.println("Exported.");
     }
 
@@ -63,16 +60,9 @@ public class SafariCrawlerApplication {
         Date date = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String strDate = dateFormat.format(date);
-
-        String isbn = books.stream().map(book -> book.getIsbn()).collect(Collectors.joining("\n"));
         String id = books.stream().map(book -> book.getIdentifier()).collect(Collectors.joining("\n"));
         try {
-            List<String> existing = new LinkedList<>(); // Files.readAllLines(Path.of("goodreads.txt")).stream().filter(s -> s!= null && !s.trim().isEmpty()).collect(Collectors.toList());
-            String newBooks = books.stream().map(book -> book.getIsbn()).filter(Objects::nonNull).filter(yy -> !existing.contains(yy.trim())).collect(Collectors.joining("\n"));
-
-            Files.write(Path.of(prefix + "-isbn-" + strDate+ ".csv"), isbn.trim().getBytes());
             Files.write(Path.of(prefix + "-id-" + strDate + ".csv"), id.trim().getBytes());
-            Files.write(Path.of(prefix + "-new-isbn-" + strDate+ ".csv"), newBooks.trim().getBytes());
         } catch (IOException e) {
             throw new RuntimeException("Wasn't able to store file: " + prefix, e);
         }

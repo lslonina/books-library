@@ -27,36 +27,25 @@ public class Crawler {
     public static final String SORT_BY_DATE_ADDED = "date_added";
     public static final String SORT_BY_PUBLICATION_DATE = "publication_date";
     public static final String SORT_BY = SORT_BY_DATE_ADDED;
-    private final Set<String> ignoredIds = new HashSet<>();
-    private final Set<String> ignoredIsbns = new HashSet<>();
-    private final Set<String> selectedIds = new HashSet<>();
-    private final Set<String> selectedIsbns = new HashSet<>();
 
     private static String createQueryBooksAddress(int page) {
         return BASE + "?sort=" + SORT_BY + "&query=*&limit=" + LIMIT + "&include_case_studies=true&include_courses=true&include_orioles=true&include_playlists=true&include_collections=true&collection_type=expert&collection_sharing=public&collection_sharing=enterprise&exclude_fields=description&page=" + page + "&formats=book";
     }
 
     private final RestTemplate restTemplate;
-
     private final SafariBookRepository safariBookRepository;
     private final SafariBookDetailsRepository safariBookDetailsRepository;
     private final BookRepository bookRepository;
+    private final Map<String, Integer> processedBooks;
 
     public Crawler(RestTemplate restTemplate, SafariBookRepository safariBookRepository,
-                   SafariBookDetailsRepository safariBookDetailsRepository, BookRepository bookCoverRepository) throws IOException {
+                   SafariBookDetailsRepository safariBookDetailsRepository, BookRepository bookCoverRepository,
+                   Map<String, Integer> processedBooks) throws IOException {
         this.restTemplate = restTemplate;
         this.safariBookRepository = safariBookRepository;
         this.safariBookDetailsRepository = safariBookDetailsRepository;
         this.bookRepository = bookCoverRepository;
-
-//        ignoredIds = new HashSet<>(Files.readAllLines(Path.of("ignored.csv-id.csv")));
-//        ignoredIsbns = new HashSet<>(Files.readAllLines(Path.of("ignored.csv-isbn.csv")));
-//        selectedIds = new HashSet<>(Files.readAllLines(Path.of("selected-id.csv")));
-//        selectedIsbns = new HashSet<>(Files.readAllLines(Path.of("selected-isbn.csv")));
-//        ignoredIds.remove(null);
-//        ignoredIsbns.remove(null);
-//        selectedIds.remove(null);
-//        selectedIsbns.remove(null);
+        this.processedBooks = processedBooks;
     }
 
     public void loadData() {
@@ -180,10 +169,9 @@ public class Crawler {
         int pageCount = details.getPageCount() != null ? details.getPageCount() : -1;
         int priority = existingBook != null ? existingBook.getPriority() : 0;
         if (priority == 0) {
-            if (selectedIds.contains(safariBook.getArchiveId()) || selectedIsbns.contains(safariBook.getIsbn())) {
-                priority = 1;
-            } else if (ignoredIds.contains(safariBook.getArchiveId()) || ignoredIsbns.contains(safariBook.getIsbn())) {
-                priority = -1;
+            if (processedBooks.containsKey(safariBook.getArchiveId())) {
+                priority = processedBooks.get(safariBook.getArchiveId());
+                log.info("Book {} already processed, with priority {}", safariBook.getTitle(), priority);
             }
         }
 
