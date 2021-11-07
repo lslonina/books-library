@@ -1,10 +1,14 @@
 package org.lslonina.books.safaricrawler.config;
 
+import org.lslonina.books.safaricrawler.crawler.BookFactory;
+import org.lslonina.books.safaricrawler.crawler.BooksProcessor;
 import org.lslonina.books.safaricrawler.crawler.Crawler;
+import org.lslonina.books.safaricrawler.crawler.OreillyClient;
 import org.lslonina.books.safaricrawler.repository.BookRepository;
 import org.lslonina.books.safaricrawler.repository.SafariBookDetailsRepository;
 import org.lslonina.books.safaricrawler.repository.SafariBookRepository;
 import org.lslonina.books.safaricrawler.service.BookService;
+import org.lslonina.books.safaricrawler.service.OreillyBookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +54,27 @@ public class Configuration implements WebMvcConfigurer{
     }
 
     @Bean
-    public Crawler crawler(RestTemplate restTemplate, SafariBookRepository safariBookRepository, 
-        SafariBookDetailsRepository safariBookDetailsRepository, BookRepository bookRepository, Map<String, Integer> processedBooks) throws IOException {
-        return new Crawler(restTemplate, safariBookRepository, safariBookDetailsRepository, bookRepository, processedBooks);
+    public OreillyClient booksClient(RestTemplate restTemplate) {
+        return new OreillyClient(restTemplate);
+    }
+
+    @Bean
+    public OreillyBookService oreillyBookService(SafariBookRepository safariBookRepository, SafariBookDetailsRepository safariBookDetailsRepository) {
+        return new OreillyBookService(safariBookRepository, safariBookDetailsRepository);
+    }
+
+    @Bean
+    public Crawler crawler(OreillyClient booksClient, OreillyBookService bookService, BooksProcessor bookProcessor) throws IOException {
+        return new Crawler(booksClient, bookService, bookProcessor);
+    }
+
+    @Bean
+    public BooksProcessor booksProcessor(OreillyBookService oreillyBookService, BookRepository bookRepository, BookFactory bookFactory) {
+        return new BooksProcessor(oreillyBookService, bookRepository, bookFactory);
+    }
+
+    @Bean BookFactory bookFactory(Map<String, Integer> processedBooks) {
+        return new BookFactory(processedBooks);
     }
 
     @Bean
