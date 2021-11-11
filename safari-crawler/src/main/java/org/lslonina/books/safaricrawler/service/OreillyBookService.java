@@ -13,6 +13,8 @@ import org.lslonina.books.safaricrawler.repository.SafariBookDetailsRepository;
 import org.lslonina.books.safaricrawler.repository.SafariBookRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 public class OreillyBookService {
     private static final Logger log = LoggerFactory.getLogger(OreillyBookService.class);
@@ -24,6 +26,10 @@ public class OreillyBookService {
             SafariBookDetailsRepository safariBookDetailsRepository) {
         this.safariBookRepository = safariBookRepository;
         this.safariBookDetailsRepository = safariBookDetailsRepository;
+    }
+
+    public Page<SafariBook> findAll(PageRequest pageRequest) {
+        return safariBookRepository.findAll(pageRequest);
     }
 
     public Collection<SafariBook> findAllBooksByIdentifierIn(Set<String> ids) {

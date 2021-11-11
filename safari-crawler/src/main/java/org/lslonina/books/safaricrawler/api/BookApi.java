@@ -43,7 +43,7 @@ public class BookApi {
             PageRequest skippedPageRequest = PageRequest.of(page == null ? 0 : page, 100, Sort.by("modificationTimestamp").descending());
             result = bookService.findSkipped(skippedPageRequest);
         } else if (filter.equals("selected")) {
-            pageRequest = PageRequest.of(page == null ? 0 : page, 100, Sort.by("published").ascending());
+            pageRequest = PageRequest.of(page == null ? 0 : page, 100, Sort.by("published").descending());
             result = bookService.findSelected(pageRequest);
             Date date = Calendar.getInstance().getTime();
             List<Book> books = result.stream().filter(b -> b.getPublished().before(date)).collect(Collectors.toList());

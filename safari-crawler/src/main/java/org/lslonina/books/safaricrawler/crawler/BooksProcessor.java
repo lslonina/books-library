@@ -26,10 +26,11 @@ public class BooksProcessor {
     }
 
     public void updateBooks(Set<String> ids) {
-        Collection<SafariBook> processedSafariBooks = oreillyBookService.findAllBooksByIdentifierIn(ids);
+        Collection<SafariBook> safariBooks = oreillyBookService.findAllBooksByIdentifierIn(ids);
         Collection<SafariBookDetails> safariBookDetails = oreillyBookService.findAllBooksDetailsByIdentifierIn(ids);
         List<Book> existingBooks = bookRepository.findAllByIdentifierIn(ids);
-        List<Book> books = createBooks(processedSafariBooks, safariBookDetails, existingBooks);
+
+        List<Book> books = createBooks(safariBooks, safariBookDetails, existingBooks);
         bookRepository.saveAll(books);
     }
 
@@ -46,7 +47,9 @@ public class BooksProcessor {
             if (details != null) {
                 Book existingBook = existingBooksMap.get(safariBook.getArchiveId());
                 String cover = details.getCover();
+                
                 Book book = bookFactory.createBook(safariBook, details, existingBook, cover);
+                
                 if (book != null && book.getPriority() != -1) {
                     BookChangeLogger.logChanges(existingBook, book);
                 }

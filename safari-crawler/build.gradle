@@ -31,8 +31,8 @@ dependencies {
 
 java {
     toolchain {
-        sourceCompatibility = '11'
-    }
+        languageVersion = JavaLanguageVersion.of(17)    
+        }
 }
 
 test {

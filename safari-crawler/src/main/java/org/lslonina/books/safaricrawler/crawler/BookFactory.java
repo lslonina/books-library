@@ -22,20 +22,11 @@ public class BookFactory {
     }
 
     public Book createBook(SafariBook safariBook, SafariBookDetails details, Book existingBook, String coverData) {
-        String added = safariBook.getDateAdded();
-        Date dateAdded = added != null ? Date.from(Instant.parse(added)) : null;
-        String issued = safariBook.getIssued();
-        Date datePublished = issued != null ? Date.from(Instant.parse(issued)) : null;
-        String modified = safariBook.getLastModifiedTime();
-        Date dateModified = modified != null ? Date.from(Instant.parse(modified)) : null;
+        Date dateAdded = getDate(safariBook.getDateAdded());
+        Date datePublished = getDate(safariBook.getIssued());
+        Date dateModified = getDate(safariBook.getLastModifiedTime());
         int pageCount = details.getPageCount() != null ? details.getPageCount() : -1;
-        int priority = existingBook != null ? existingBook.getPriority() : 0;
-        if (priority == 0) {
-            if (processedBooks.containsKey(safariBook.getArchiveId())) {
-                priority = processedBooks.get(safariBook.getArchiveId());
-                log.info("Book {} already processed, with priority {}", safariBook.getTitle(), priority);
-            }
-        }
+        int priority = getPriority(safariBook, existingBook);
 
         BookBuilder bookBuilder = new BookBuilder(safariBook.getArchiveId())
                 .withTitle(safariBook.getTitle())
@@ -53,6 +44,19 @@ public class BookFactory {
         Book newBook = bookBuilder.build();
 
         return Objects.equals(newBook, existingBook) ? null : newBook;
+    }
+
+    private int getPriority(SafariBook safariBook, Book existingBook) {
+        int priority = existingBook != null ? existingBook.getPriority() : 0;
+        if (priority == 0  && processedBooks.containsKey(safariBook.getArchiveId())) {
+            priority = processedBooks.get(safariBook.getArchiveId());
+            log.info("Book {} already processed, with priority {}", safariBook.getTitle(), priority);
+        }
+        return priority;
+    }
+
+    private Date getDate(String text) {
+        return text != null ? Date.from(Instant.parse(text)) : null;
     }
 
 }

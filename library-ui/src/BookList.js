@@ -102,7 +102,7 @@ class BookList extends Component {
                 <td style={{whiteSpace: 'nowrap'}}><Moment format={"DD-MM-YYYY"}>{published}</Moment></td>
                 <td style={{whiteSpace: 'nowrap'}}><Moment format={"DD-MM-YYYY"}>{added}</Moment></td>
                 <td>{book.pages}</td>
-                <td><img src={`/api/books/${book.identifier}/cover`} alt="Cover"/></td>
+                <td><img src={`/api/books/${book.identifier}/cover`} alt="Cover" width="250"/></td>
                 <td>{book.priority}</td>
                 <td>
                     <ButtonGroup>
