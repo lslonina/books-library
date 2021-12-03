@@ -1,6 +1,15 @@
 plugins {
     id "java"
     id "com.github.ben-manes.versions" version '0.39.0'
+  id "org.sonarqube" version "3.3"
+}
+
+sonarqube {
+  properties {
+    property "sonar.projectKey", "lslonina_books-library"
+    property "sonar.organization", "lslonina"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 repositories {

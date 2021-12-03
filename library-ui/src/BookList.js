@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import {Button, ButtonGroup, Container, Table} from 'reactstrap';
-import {Link, withRouter} from 'react-router-dom';
-import {instanceOf} from 'prop-types';
-import {withCookies, Cookies} from 'react-cookie';
-import queryString from 'query-string'
-import Home from "./Home";
 import parse from 'html-react-parser';
+import { instanceOf } from 'prop-types';
+import queryString from 'query-string';
+import React, { Component } from 'react';
+import { Cookies, withCookies } from 'react-cookie';
 import Moment from "react-moment";
+import { Link, withRouter } from 'react-router-dom';
+import { Button, ButtonGroup, Container, Table } from 'reactstrap';
+import Home from "./Home";
 
 class BookList extends Component {
     static propTypes = {
@@ -106,11 +106,9 @@ class BookList extends Component {
                 <td>{book.priority}</td>
                 <td>
                     <ButtonGroup>
-                        <Button size="sm" color="primary" tag={Link} to={"/book/" + book.identifier}>Info</Button>
-                        <Button size="sm" color="success"
-                                onClick={() => this.mark(book.identifier, 'select')}>Select</Button>
-                        <Button size="sm" color="danger"
-                                onClick={() => this.mark(book.identifier, 'skip')}>Skip</Button>
+                        <Button size="sm" color="success" onClick={() => this.mark(book.identifier, 'select')}>Select</Button>
+                        <Button size="sm" color="secondary" onClick={() => this.mark(book.identifier, 'postpone')}>Postpone</Button>
+                        <Button size="sm" color="danger"  onClick={() => this.mark(book.identifier, 'skip')}>Skip</Button>
                     </ButtonGroup>
                 </td>
             </tr>

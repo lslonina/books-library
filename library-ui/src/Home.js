@@ -12,7 +12,9 @@ class Home extends Component {
                 <Container fluid>
                     <Button color="link"><Link to="/books?filter=unprocessed">Unprocessed books</Link></Button>
                     <Button color="link"><Link to="/books?filter=selected">Selected books</Link></Button>
+                    <Button color="link"><Link to="/books?filter=priority">Priority books</Link></Button>
                     <Button color="link"><Link to="/books?filter=skipped">Skipped books</Link></Button>
+                    <Button color="link"><Link to="/books?filter=postponed">Postponed</Link></Button>
                     <Button color="link"><Link to="/books?filter=all">All books</Link></Button>
                     <Button color="link"><Link to="/books">All books (not paged)</Link></Button>
                 </Container>

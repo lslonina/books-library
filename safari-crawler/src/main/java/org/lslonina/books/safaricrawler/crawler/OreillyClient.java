@@ -50,14 +50,13 @@ public class OreillyClient {
         for (SafariBook safariBook : safariBooks) {
             threadPool.submit(() -> {
                 try {
-                    SafariBookDetails bookDetails = restTemplate.getForObject(safariBook.getUrl(),
-                            SafariBookDetails.class);
+                    SafariBookDetails bookDetails = restTemplate.getForObject(safariBook.getUrl(), SafariBookDetails.class);
                     bookDetails.setPublisherResourceLinks(null);
                     String cover = getCover(safariBook);
                     bookDetails.setCover(cover);
                     result.add(bookDetails);
                 } catch (Exception e) {
-                    log.error("Can't fetch details for: {}", safariBook.getTitle());
+                    log.error("Can't fetch details for: {}", safariBook.getUrl());
                     e.printStackTrace();
                 } finally {
                     latch.countDown();

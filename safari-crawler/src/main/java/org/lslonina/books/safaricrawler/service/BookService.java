@@ -39,6 +39,14 @@ public class BookService {
         return bookRepository.findAllByPriorityEqualsAndLanguageEquals(1, "en", pageRequest);
     }
 
+    public Page<Book> findPostponed(PageRequest pageRequest) {
+        return bookRepository.findAllByPriorityEqualsAndLanguageEquals(3, "en", pageRequest);
+    }
+
+    public Page<Book> findSelectedWithPriority(PageRequest pageRequest) {
+        return bookRepository.findAllByPriorityEqualsAndLanguageEquals(2, "en", pageRequest);
+    }
+
     public Page<Book> findAllSelected() {
         return bookRepository.findAllByPriorityGreaterThanAndLanguageEquals(0, "en", PageRequest.of(0, Integer.MAX_VALUE, Sort.by("modificationTimestamp").descending()));
     }
@@ -60,6 +68,10 @@ public class BookService {
         updateBookPriority(id, byId.getPriority() + 1);
     }
 
+    public void postpone(String id) {
+        updateBookPriority(id, 3);
+    }
+
     private void updateBookPriority(String id, int priority) {
         Book book = findById(id);
         book.setModificationTimestamp(new Date());
@@ -68,9 +80,8 @@ public class BookService {
     }
 
     public void export() {
-        List<Book> all = bookRepository.findAll();
-        List<Book> selected = all.stream().filter(b -> b.getPriority() > 0).collect(Collectors.toList());
-        List<Book> ignored = all.stream().filter(b -> b.getPriority() < 0).collect(Collectors.toList());
+        List<Book> selected = bookRepository.findAllByPriorityGreaterThanAndLanguageEquals(0, "en");
+        List<Book> ignored = bookRepository.findAllByPriorityLessThanAndLanguageEquals(0, "en");
 
         export(selected, "selected");
         export(ignored, "ignored");

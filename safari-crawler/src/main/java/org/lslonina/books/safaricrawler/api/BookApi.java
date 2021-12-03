@@ -1,6 +1,12 @@
 package org.lslonina.books.safaricrawler.api;
 
 
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.lslonina.books.safaricrawler.dto.Book;
 import org.lslonina.books.safaricrawler.service.BookService;
 import org.slf4j.Logger;
@@ -11,13 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"}, allowCredentials = "true")
 @RestController
@@ -42,7 +48,13 @@ public class BookApi {
         } else if (filter.equals("skipped")) {
             PageRequest skippedPageRequest = PageRequest.of(page == null ? 0 : page, 100, Sort.by("modificationTimestamp").descending());
             result = bookService.findSkipped(skippedPageRequest);
-        } else if (filter.equals("selected")) {
+        } else if (filter.equals("priority")) {
+            result = bookService.findSelectedWithPriority(pageRequest);
+        }
+         else if (filter.equals("postponed")) {
+            result = bookService.findPostponed(pageRequest);
+        }        
+        else if (filter.equals("selected")) {
             pageRequest = PageRequest.of(page == null ? 0 : page, 100, Sort.by("published").descending());
             result = bookService.findSelected(pageRequest);
             Date date = Calendar.getInstance().getTime();
@@ -50,12 +62,20 @@ public class BookApi {
             result = new PageImpl<Book>(books);
         } else if (filter.equals("unprocessed")) {
             result = bookService.findUnprocessed(pageRequest);
-        } else {
+        } 
+        else {
             throw new RuntimeException("Query param not supported: " + filter);
         }
         log.info("Total: " + result.getTotalElements());
         return result.toList();
     }
+
+    @GetMapping("/books/export")
+    public String export() {
+        bookService.export();
+        return "Data exported";
+    }
+
 
     @GetMapping("/books/{id}")
     public Book one(@PathVariable String id) {
@@ -75,9 +95,15 @@ public class BookApi {
 
     @PostMapping("/books/{id}/select")
     public void select(@PathVariable String id) {
-//        log.info("Selecting: " + id);
         if (!id.equals("undefined")) {
             bookService.select(id);
+        }
+    }
+
+    @PostMapping("/books/{id}/postpone")
+    public void postpone(@PathVariable String id) {
+        if (!id.equals("undefined")) {
+            bookService.postpone(id);
         }
     }
 
