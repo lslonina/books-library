@@ -12,11 +12,15 @@ import java.util.stream.Collectors;
 
 import org.lslonina.books.safaricrawler.dto.Book;
 import org.lslonina.books.safaricrawler.repository.BookRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 public class BookService {
+    private static final Logger log = LoggerFactory.getLogger(BookService.class);
+
     private final BookRepository bookRepository;
 
     public BookService(BookRepository bookRepository) {
@@ -80,12 +84,17 @@ public class BookService {
     }
 
     public void export() {
+        log.info("Export books.");
+        log.info("Get selected.");
         List<Book> selected = bookRepository.findAllByPriorityGreaterThanAndLanguageEquals(0, "en");
+        log.info("Get ignored.");
         List<Book> ignored = bookRepository.findAllByPriorityLessThanAndLanguageEquals(0, "en");
 
+        log.info("Write selected.");
         export(selected, "selected");
+        log.info("Write ignored.");
         export(ignored, "ignored");
-        System.out.println("Exported.");
+        log.info("Exported books.");
     }
 
     public void export(List<Book> books, String prefix) {

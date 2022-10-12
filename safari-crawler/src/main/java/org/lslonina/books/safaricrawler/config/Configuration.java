@@ -26,6 +26,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
+import org.lslonina.books.safaricrawler.CrawlerRunner;
 import org.lslonina.books.safaricrawler.crawler.BookFactory;
 import org.lslonina.books.safaricrawler.crawler.BooksProcessor;
 import org.lslonina.books.safaricrawler.crawler.Crawler;
@@ -106,6 +107,11 @@ public class Configuration implements WebMvcConfigurer {
     public Crawler crawler(OreillyClient booksClient, OreillyBookService oreillyBookService, BookService bookService,
             BooksProcessor bookProcessor) throws IOException {
         return new Crawler(booksClient, oreillyBookService, bookService, bookProcessor);
+    }
+
+    @Bean
+    public CrawlerRunner crawlerRunner(Crawler crawler) {
+        return new CrawlerRunner(crawler);
     }
 
     @Bean

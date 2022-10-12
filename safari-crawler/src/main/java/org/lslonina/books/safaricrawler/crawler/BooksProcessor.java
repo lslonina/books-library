@@ -25,13 +25,15 @@ public class BooksProcessor {
         this.bookFactory = bookFactory;
     }
 
-    public void updateBooks(Set<String> ids) {
+    public int updateBooks(Set<String> ids) {
         Collection<SafariBook> safariBooks = oreillyBookService.findAllBooksByIdentifierIn(ids);
         Collection<SafariBookDetails> safariBookDetails = oreillyBookService.findAllBooksDetailsByIdentifierIn(ids);
         List<Book> existingBooks = bookRepository.findAllByIdentifierIn(ids);
 
         List<Book> books = createBooks(safariBooks, safariBookDetails, existingBooks);
         bookRepository.saveAll(books);
+
+        return books.size();
     }
 
     private List<Book> createBooks(Collection<SafariBook> safariBooks, Collection<SafariBookDetails> safariBookDetails, List<Book> existingBooks) {

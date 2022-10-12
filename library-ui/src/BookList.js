@@ -121,7 +121,7 @@ class BookList extends Component {
                     <div className="float-right">
                         <Button color="success" tag={Link} to="/books/new">Add Book</Button>
                     </div>
-                    <h3>My Library, showing: {this.state.books.length}</h3>
+                    <h3>My Library, page: {currentPage+1}, showing: {this.state.books.length}</h3>
                     <Button size="sm" color="success"
                             onClick={() => this.queryBooks(previousPage)}>Previous</Button>
                     <Button size="sm" color="success"

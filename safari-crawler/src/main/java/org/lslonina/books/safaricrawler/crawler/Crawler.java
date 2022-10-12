@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.lslonina.books.safaricrawler.dto.Book;
@@ -47,8 +46,11 @@ public class Crawler {
                 }
 
                 Set<String> ids = processSafariBooks(safariBooks);
-                booksProcessor.updateBooks(ids);
-
+                int updated = booksProcessor.updateBooks(ids);
+                if (updated < 1) {
+                    log.info("All books already loaded, use full reload.");
+                    return;
+                }
                 page++;
             } catch (Exception e) {
                 log.error("Error while processing page {}", page, e);
